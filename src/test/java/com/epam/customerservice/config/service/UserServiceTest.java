@@ -1,33 +1,35 @@
 package com.epam.customerservice.config.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.epam.customerservice.config.config.TestContainerConfig;
 import com.epam.customerservice.dto.UserDto;
 import com.epam.customerservice.exception.EntityNotFoundException;
 import com.epam.customerservice.repository.RegisteredUserRepository;
+import com.epam.customerservice.service.RabbitMqListener;
 import com.epam.customerservice.service.UserService;
-import org.apache.catalina.User;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest(classes = TestContainerConfig.class)
 @Testcontainers
-@RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 public class UserServiceTest {
 
     private Long sessionId;
     private UserDto savedUserDto;
+
+    @MockBean
+    RabbitMqListener rabbitMqListener;
 
     @Autowired
     private JdbcDatabaseContainer jdbcDatabaseContainer;
@@ -38,7 +40,7 @@ public class UserServiceTest {
     @Autowired
     private RegisteredUserRepository registeredUserRepository;
 
-    @Before
+    @BeforeEach
     public void prepareData() {
         sessionId = userService.createUser();
 
@@ -52,7 +54,7 @@ public class UserServiceTest {
         userService.putRegisteredUserToUser(sessionId, savedUserDto.getId());
     }
 
-    @After
+    @AfterEach
     public void dropData() {
         userService.deleteAllSessionIds();
         userService.deleteAllUserInfo();

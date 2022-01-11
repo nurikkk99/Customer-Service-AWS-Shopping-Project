@@ -16,7 +16,6 @@ public class RabbitMqConfig {
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(host);
-//        cachingConnectionFactory.setPort(15672);
         return cachingConnectionFactory;
     }
 

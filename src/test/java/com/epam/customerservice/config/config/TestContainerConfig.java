@@ -25,6 +25,7 @@ public class TestContainerConfig {
     public DataSource dataSource(JdbcDatabaseContainer<?> jdbcDatabaseContainer) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(jdbcDatabaseContainer.getJdbcUrl());
+        System.out.println(jdbcDatabaseContainer.getJdbcUrl());
         hikariConfig.setUsername(jdbcDatabaseContainer.getUsername());
         hikariConfig.setPassword(jdbcDatabaseContainer.getPassword());
         return new HikariDataSource(hikariConfig);
