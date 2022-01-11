@@ -2,8 +2,7 @@ package com.epam.customerservice.config.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,44 +10,38 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.Assert.assertEquals;
 
 import com.epam.customerservice.config.config.TestContainerConfig;
-import com.epam.customerservice.dto.GoodsType;
-import com.epam.customerservice.dto.ProductDto;
 import com.epam.customerservice.dto.UserDto;
-import com.epam.customerservice.service.ProductService;
+import com.epam.customerservice.service.RabbitMqListener;
 import com.epam.customerservice.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest(classes = TestContainerConfig.class)
 @Testcontainers
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class UserControllerTest {
 
     public static String API_PATH = "/api/users/";
 
     private Long sessionId;
     private UserDto savedUserDto;
+
+    @MockBean
+    RabbitMqListener rabbitMqListener;
 
     @Autowired
     private UserService userService;
@@ -59,7 +52,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Before
+    @BeforeEach
     public void prepareData() throws ParseException {
         sessionId = userService.createUser();
 
@@ -73,7 +66,7 @@ public class UserControllerTest {
         userService.putRegisteredUserToUser(sessionId, savedUserDto.getId());
     }
 
-    @After
+    @AfterEach
     public void dropData() {
         userService.deleteAllSessionIds();
         userService.deleteAllUserInfo();
@@ -81,11 +74,6 @@ public class UserControllerTest {
 
     @Test
     public void createUserTest() throws Exception {
-//        UserDto userDto = new UserDto();
-//        userDto.setId(100L);
-//        userDto.setName("Aleksei");
-//        userDto.setSurname("Chebatov");
-//        userDto.setPhoneNumber(893364456634L);
         Long sessionId = userService.createUser();
 
         String contentAsString = mockMvc.perform(post(API_PATH))

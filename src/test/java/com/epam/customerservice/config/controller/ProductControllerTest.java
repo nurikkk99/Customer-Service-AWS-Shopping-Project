@@ -2,19 +2,19 @@ package com.epam.customerservice.config.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.epam.customerservice.config.config.ElasticSearchTestContainer;
 import com.epam.customerservice.config.config.TestContainerConfig;
 import com.epam.customerservice.dto.GoodsType;
 import com.epam.customerservice.dto.ProductDto;
 import com.epam.customerservice.dto.SearchAndFilterRequestDto;
 import com.epam.customerservice.service.ProductService;
+import com.epam.customerservice.service.RabbitMqListener;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
@@ -24,23 +24,23 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest(classes = {ElasticSearchTestContainer.class, TestContainerConfig.class})
+@SpringBootTest(classes = TestContainerConfig.class)
 @Testcontainers
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class ProductControllerTest {
 
     public static String API_PATH = "/api/products/";
@@ -48,11 +48,14 @@ public class ProductControllerTest {
     private ProductDto savedProductDto1;
     private ProductDto savedProductDto2;
 
+    @MockBean
+    RabbitMqListener rabbitMqListener;
+
     @Autowired
     private TestContainerConfig testContainerConfig;
 
     @Autowired
-    private ElasticsearchContainer elasticsearchContainer;
+    private static ElasticsearchContainer elasticsearchContainer;
 
     @Autowired
     private ProductService productService;
@@ -63,7 +66,7 @@ public class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Before
+    @BeforeEach
     public void prepareData() throws ParseException {
         ProductDto productDto = new ProductDto();
         productDto.setId(1L);
@@ -99,7 +102,7 @@ public class ProductControllerTest {
         productService.save(productDto3);
     }
 
-    @After
+    @AfterEach
     public void dropData() {
         productService.deleteAll();
     }

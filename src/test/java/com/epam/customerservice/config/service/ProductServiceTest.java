@@ -1,14 +1,14 @@
 package com.epam.customerservice.config.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.epam.customerservice.config.config.ElasticSearchTestContainer;
 import com.epam.customerservice.config.config.TestContainerConfig;
 import com.epam.customerservice.dto.GoodsType;
 import com.epam.customerservice.dto.ProductDto;
 import com.epam.customerservice.dto.SearchAndFilterRequestDto;
 import com.epam.customerservice.service.ProductService;
+import com.epam.customerservice.service.RabbitMqListener;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,33 +16,33 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest(classes = {ElasticSearchTestContainer.class, TestContainerConfig.class})
+@SpringBootTest(classes = TestContainerConfig.class)
 @Testcontainers
-@RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 public class ProductServiceTest {
 
     private ProductDto savedProductDto1;
+
+    @MockBean
+    RabbitMqListener rabbitMqListener;
 
     @Autowired
     private TestContainerConfig testContainerConfig;
 
     @Autowired
-    private ElasticsearchContainer elasticsearchContainer;
-
-    @Autowired
     private ProductService productService;
 
-    @Before
+    @BeforeEach
     public void prepareData() throws ParseException {
         ProductDto productDto = new ProductDto();
         productDto.setId(1L);
@@ -67,7 +67,7 @@ public class ProductServiceTest {
         productService.save(productDto2);
     }
 
-    @After
+    @AfterEach
     public void dropData() {
         productService.deleteAll();
     }
