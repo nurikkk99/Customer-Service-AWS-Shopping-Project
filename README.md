@@ -7,7 +7,7 @@ This service is designed to provide services for receiving, filtering goods. The
 
 SWAGGER API for customer service described on **CustomerServiceSwagger** at the root of project
 
-#Interaction Scheme
+#Interaction Scheme 
 ![](readme/schema.png)
 
 
