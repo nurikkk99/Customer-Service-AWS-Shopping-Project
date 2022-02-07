@@ -1,10 +1,13 @@
 package com.epam.customerservice.entity;
 
 import com.epam.customerservice.helper.Indices;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.util.Date;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -32,7 +35,7 @@ public class ProductEntity {
     private String manufacturer;
 
     @Field(type = FieldType.Date, format = {}, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-    private Date releaseDateTime;
+    private Date releaseDate;
 
     public Long getId() {
         return id;
@@ -74,11 +77,11 @@ public class ProductEntity {
         this.manufacturer = manufacturer;
     }
 
-    public Date getReleaseDateTime() {
-        return releaseDateTime;
+    public Date getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setReleaseDateTime(Date releaseDateTime) {
-        this.releaseDateTime = releaseDateTime;
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
     }
 }

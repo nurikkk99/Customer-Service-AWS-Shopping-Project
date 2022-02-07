@@ -155,7 +155,7 @@ public class HelloCdkStack extends Stack {
         IRole serviceTaskRole = Role.Builder.create(this, "ServiceTaskRole")
                 .assumedBy(ServicePrincipal.Builder.create("ecs-tasks.amazonaws.com").build()).build();
 
-        ApplicationLoadBalancedEc2Service.Builder.create(this, "customer-shopping-service")
+        ApplicationLoadBalancedEc2Service ec2Service = ApplicationLoadBalancedEc2Service.Builder.create(this, "customer-shopping-service")
                 .cluster(cluster)
                 .publicLoadBalancer(true)
                 .healthCheckGracePeriod(Duration.hours(4))
@@ -174,7 +174,8 @@ public class HelloCdkStack extends Stack {
                                         "ELASTIC_URI", domain.getDomainEndpoint(),
                                         "RABBIT_ENDPOINT", StringParameter.valueForStringParameter(this, "brokersEndpointSSM"),
                                         "RABBIT_USERNAME", StringParameter.valueForStringParameter(this, "brokersUsernameSSM"),
-                                        "RABBIT_PASSWORD", StringParameter.valueForStringParameter(this, "brokersPasswordSSM")
+                                        "RABBIT_PASSWORD", StringParameter.valueForStringParameter(this, "brokersPasswordSSM"),
+                                        "ADMIN_LOAD_BALANCER_URL", StringParameter.valueForStringParameter(this, "adminServiceLoadBalancerDNSName")
                                 ))
                                 .secrets(Map.of(
                                         "POSTGRES_PASSWORD", Secret.fromSecretsManager(postgresDatabaseSecret, "password"),
@@ -190,5 +191,7 @@ public class HelloCdkStack extends Stack {
                                 .build()
                 )
                 .build();
+
+
     }
 }

@@ -1,6 +1,8 @@
 package com.epam.customerservice.dto;
 
 import com.epam.customerservice.entity.ProductEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -14,7 +16,9 @@ public class ProductDto implements EntityDtoMapper<ProductDto, ProductEntity>{
     private GoodsType type;
     private BigDecimal price;
     private String manufacturer;
-    private Date releaseDateTime;
+
+    @JsonFormat(shape = Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private Date releaseDate;
 
     public Long getId() {
         return id;
@@ -56,13 +60,14 @@ public class ProductDto implements EntityDtoMapper<ProductDto, ProductEntity>{
         this.manufacturer = manufacturer;
     }
 
-    public Date getReleaseDateTime() {
-        return releaseDateTime;
+    public Date getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setReleaseDateTime(Date releaseDateTime) {
-        this.releaseDateTime = releaseDateTime;
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
     }
+
 
 
     @Override
@@ -73,7 +78,7 @@ public class ProductDto implements EntityDtoMapper<ProductDto, ProductEntity>{
         Optional.ofNullable(entity.getType()).ifPresent(x -> productDto.setType(GoodsType.valueOf(x)));
         productDto.setPrice(entity.getPrice());
         productDto.setManufacturer(entity.getManufacturer());
-        productDto.setReleaseDateTime(entity.getReleaseDateTime());
+        productDto.setReleaseDate(entity.getReleaseDate());
         return productDto;
     }
 
@@ -85,7 +90,7 @@ public class ProductDto implements EntityDtoMapper<ProductDto, ProductEntity>{
         Optional.ofNullable(this.type).ifPresent(x -> productEntity.setType(x.toString()));
         productEntity.setPrice(this.price);
         productEntity.setManufacturer(this.getManufacturer());
-        productEntity.setReleaseDateTime(this.releaseDateTime);
+        productEntity.setReleaseDate(this.releaseDate);
         return productEntity;
     }
 
@@ -109,6 +114,6 @@ public class ProductDto implements EntityDtoMapper<ProductDto, ProductEntity>{
     @Override
     public String toString() {
         return "ProductDto{" + "id=" + id + ", name='" + name + '\'' + ", type=" + type + ", price=" + price
-                + ", manufacturer='" + manufacturer + '\'' + ", releaseDateTime=" + releaseDateTime + '}';
+                + ", manufacturer='" + manufacturer + '\'' + ", releaseDate=" + releaseDate + '}';
     }
 }
