@@ -76,7 +76,7 @@ public class ProductControllerTest {
         productDto.setType(GoodsType.Sneakers);
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String string1 = "2021-12-30T13:00:00.000-0700";
-        productDto.setReleaseDateTime(df1.parse(string1));
+        productDto.setReleaseDate(df1.parse(string1));
         savedProductDto1 = productService.save(productDto);
 
         ProductDto productDto2 = new ProductDto();
@@ -87,7 +87,7 @@ public class ProductControllerTest {
         productDto2.setType(GoodsType.Sneakers);
         DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String string2 = "2021-12-27T13:00:00.000-0700";
-        productDto2.setReleaseDateTime(df2.parse(string2));
+        productDto2.setReleaseDate(df2.parse(string2));
         savedProductDto2 = productService.save(productDto2);
 
         ProductDto productDto3 = new ProductDto();
@@ -98,13 +98,15 @@ public class ProductControllerTest {
         productDto3.setType(GoodsType.Sneakers);
         DateFormat df3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String string3 = "2021-12-29T13:00:00.000-0700";
-        productDto3.setReleaseDateTime(df3.parse(string3));
+        productDto3.setReleaseDate(df3.parse(string3));
         productService.save(productDto3);
     }
 
     @AfterEach
     public void dropData() {
-        productService.deleteAll();
+        productService.deleteById(1L);
+        productService.deleteById(2L);
+        productService.deleteById(3L);
     }
 
     @Test
