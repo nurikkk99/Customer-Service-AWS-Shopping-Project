@@ -28,7 +28,7 @@ public class RegisteredUserEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "prone_number")
+    @Column(name = "phone_number")
     private long phoneNUmber;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "registeredUser")
