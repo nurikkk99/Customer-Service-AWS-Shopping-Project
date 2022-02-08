@@ -2,12 +2,11 @@ package com.epam.customerservice.service;
 
 import com.epam.customerservice.dto.ImageQueueResponseDto;
 import com.epam.customerservice.dto.ProductDto;
-import com.epam.customerservice.dto.ProductQueueResponseDto;
+import com.epam.customerservice.dto.ProductIdQueueResponseDto;
+import com.epam.customerservice.feign.AdminFeignClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -24,30 +23,36 @@ public class RabbitMqListener {
     private ProductService productService;
     private ObjectMapper objectMapper;
     private ProductDto productDto;
+    private AdminFeignClient adminFeignClient;
 
-    public RabbitMqListener(ProductService productService, ObjectMapper objectMapper) {
+    public RabbitMqListener(ProductService productService, ObjectMapper objectMapper, AdminFeignClient adminFeignClient) {
         this.productService = productService;
         this.objectMapper = objectMapper;
         this.productDto = new ProductDto();
+        this.adminFeignClient = adminFeignClient;
     }
 
     @RabbitListener(queues = "products")
-    public void productsListener(String message) throws JsonProcessingException, ParseException {
-        ProductQueueResponseDto productQueueResponseDto = objectMapper.readValue(
-                message, ProductQueueResponseDto.class);
-        ProductDto productDto = productQueueResponseDto.getProductDto();
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-        productDto.setReleaseDateTime(format.parse(productQueueResponseDto.getCreationDate()));
+    public void productsListener(String message) throws JsonProcessingException {
+        ProductIdQueueResponseDto productIdQueueResponseDto = objectMapper.readValue(
+                message, ProductIdQueueResponseDto.class);
+        Long productId = productIdQueueResponseDto.getProductId();
         logger.info(
-                "Got message from product queue: message type = {}, product entity = {}",
-                productQueueResponseDto.getType(), productQueueResponseDto.getProductDto().toString()
+                "Got message from product queue: message type = {}, product id = {}",
+                productIdQueueResponseDto.getType(), productId
         );
-        if (productQueueResponseDto.getType().equals("save")) {
+        if (productIdQueueResponseDto.getType().equals("save")) {
+            ProductDto productDto = adminFeignClient.findOne(productId);
             productService.save(productDto);
-        } else if (productQueueResponseDto.getType().equals("update")) {
+            logger.info("Product was saved: {}", productDto);
+        }
+        else if (productIdQueueResponseDto.getType().equals("update")) {
+            ProductDto productDto = adminFeignClient.findOne(productId);
             productService.update(productDto);
+            logger.info("Product was updated - {}", productDto);
         }
     }
+
 
     @RabbitListener(queues = "images")
     public void imagesListener(String message) throws JsonProcessingException {

@@ -22,7 +22,6 @@ import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -77,7 +76,8 @@ public class ProductService {
             List<ProductDto> products = new ArrayList<>(searchHits.length);
 
             for (SearchHit hit : searchHits) {
-                products.add(objectMapper.readValue(hit.getSourceAsString(), ProductDto.class));
+                ProductEntity productEntity = objectMapper.readValue(hit.getSourceAsString(), ProductEntity.class);
+                products.add(productDto.entityToDto(productEntity));
             }
             return products;
         } catch (IOException e) {

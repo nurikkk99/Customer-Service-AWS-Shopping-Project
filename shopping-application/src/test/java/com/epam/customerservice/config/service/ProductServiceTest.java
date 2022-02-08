@@ -9,6 +9,8 @@ import com.epam.customerservice.dto.ProductDto;
 import com.epam.customerservice.dto.SearchAndFilterRequestDto;
 import com.epam.customerservice.service.ProductService;
 import com.epam.customerservice.service.RabbitMqListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -41,6 +43,9 @@ public class ProductServiceTest {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     public void prepareData() throws ParseException {
         ProductDto productDto = new ProductDto();
@@ -51,7 +56,7 @@ public class ProductServiceTest {
         productDto.setType(GoodsType.Sneakers);
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String string1 = "2021-12-27T13:00:00.000-0700";
-        productDto.setReleaseDateTime(df1.parse(string1));
+        productDto.setReleaseDate(df1.parse(string1));
         savedProductDto1 = productService.save(productDto);
 
         ProductDto productDto2 = new ProductDto();
@@ -62,7 +67,7 @@ public class ProductServiceTest {
         productDto2.setType(GoodsType.Sneakers);
         DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String string2 = "2021-12-30T13:00:00.000-0700";
-        productDto2.setReleaseDateTime(df2.parse(string2));
+        productDto2.setReleaseDate(df2.parse(string2));
         productService.save(productDto2);
     }
 
@@ -121,17 +126,36 @@ public class ProductServiceTest {
     @Test
     public void searchAndFilterShouldSortByDateTest() {
         SearchAndFilterRequestDto requestDto= new SearchAndFilterRequestDto();
-        requestDto.setSortType("releaseDateTime");
+        requestDto.setSortType("releaseDate");
         requestDto.setSortOrder(SortOrder.ASC);
         List<ProductDto> searchedProducts = productService.searchAndFilter(requestDto);
         assertTrue(searchedProducts.size()==2);
-        assertTrue(searchedProducts.get(0).getReleaseDateTime().before(searchedProducts.get(1).getReleaseDateTime()));
+        assertTrue(searchedProducts.get(0).getReleaseDate().before(searchedProducts.get(1).getReleaseDate()));
 
         SearchAndFilterRequestDto requestDto2= new SearchAndFilterRequestDto();
-        requestDto2.setSortType("releaseDateTime");
+        requestDto2.setSortType("releaseDate");
         requestDto2.setSortOrder(SortOrder.DESC);
         List<ProductDto> searchedProducts2 = productService.searchAndFilter(requestDto2);
         assertTrue(searchedProducts2.size()==2);
-        assertTrue(searchedProducts2.get(0).getReleaseDateTime().after(searchedProducts2.get(1).getReleaseDateTime()));
+        assertTrue(searchedProducts2.get(0).getReleaseDate().after(searchedProducts2.get(1).getReleaseDate()));
+    }
+
+    @Test
+    public void productDateFromJsonTest() throws ParseException, JsonProcessingException {
+        ProductDto productDto = new ProductDto();
+        productDto.setId(1L);
+        productDto.setPrice(BigDecimal.valueOf(10000));
+        productDto.setName("Stan Smith");
+        productDto.setManufacturer("Adidas");
+
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        productDto.setReleaseDate(format.parse("07-02-2022 22:00:00"));
+
+        objectMapper.setDateFormat(format);
+        String objectAsJson = objectMapper.writeValueAsString(productDto);
+
+        ObjectMapper objectMapperNew = new ObjectMapper();
+        ProductDto convertedDto = objectMapperNew.readValue(objectAsJson, ProductDto.class);
+        assertTrue(productDto.getReleaseDate().equals(convertedDto.getReleaseDate()));
     }
 }
