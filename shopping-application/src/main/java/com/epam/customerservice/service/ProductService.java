@@ -60,9 +60,14 @@ public class ProductService {
         return savedProductDto;
     }
 
-    public void deleteAll() {
+//    public void deleteAll() {
+//        logger.info("Deleting all products in elastic database");
+//        productElasticDatabaseRepository.deleteAll();
+//    }
+
+    public void deleteById(Long id) {
         logger.info("Deleting all products in elastic database");
-        productElasticDatabaseRepository.deleteAll();
+        productElasticDatabaseRepository.deleteById(id);
     }
 
     public List<ProductDto> searchAndFilter(SearchAndFilterRequestDto requestDto) {

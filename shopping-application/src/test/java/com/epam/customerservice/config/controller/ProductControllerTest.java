@@ -104,7 +104,9 @@ public class ProductControllerTest {
 
     @AfterEach
     public void dropData() {
-        productService.deleteAll();
+        productService.deleteById(1L);
+        productService.deleteById(2L);
+        productService.deleteById(3L);
     }
 
     @Test

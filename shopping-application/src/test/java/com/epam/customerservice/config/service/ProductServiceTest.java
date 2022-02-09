@@ -73,7 +73,8 @@ public class ProductServiceTest {
 
     @AfterEach
     public void dropData() {
-        productService.deleteAll();
+        productService.deleteById(1L);
+        productService.deleteById(2L);
     }
 
     @Test

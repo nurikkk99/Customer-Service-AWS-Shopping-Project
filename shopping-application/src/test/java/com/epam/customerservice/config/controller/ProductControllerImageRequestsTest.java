@@ -75,7 +75,7 @@ public class ProductControllerImageRequestsTest {
 
     @AfterEach
     public void dropData() {
-        productService.deleteAll();
+        productService.deleteById(1L);
     }
 
     @Test
